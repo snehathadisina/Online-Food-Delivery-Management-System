@@ -1,0 +1,476 @@
+mysql> CREATE DATABASE FOOD_DELIVARY;
+Query OK, 1 row affected (0.02 sec)
+
+mysql> USE FOOD_DELIVARY;
+Database changed
+mysql> CREATE TABLE CUSTOMERS (
+    ->   CUSTOMER_ID INT PRIMARY KEY,
+    ->   NAME VARCHAR(100),
+    ->   PHONE VARCHAR(15),
+    ->   ADDRESS VARCHAR(150)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE RESTAURANTS (
+    ->   RESTAURANT_ID INT PRIMARY KEY,
+    ->   NAME VARCHAR(100),
+    ->   LOCATION VARCHAR(100),
+    ->   PHONE VARCHAR(15)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE MENU_ITEMS (
+    ->   ITEM_ID INT PRIMARY KEY,
+    ->   ITEM_NAME VARCHAR(100),
+    ->   PRICE DECIMAL(8,2),
+    ->   RESTAURANT_ID INT,
+    ->   FOREIGN KEY (RESTAURANT_ID) REFERENCES RESTAURANTS(RESTAURANT_ID)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> CREATE TABLE ORDERS (
+    ->   ORDER_ID INT PRIMARY KEY,
+    ->   ORDER_DATE DATE,
+    ->   TOTAL_AMOUNT DECIMAL(10,2),
+    ->   CUSTOMER_ID INT,
+    ->   RESTAURANT_ID INT,
+    ->   FOREIGN KEY (CUSTOMER_ID) REFERENCES CUSTOMERS(CUSTOMER_ID),
+    ->   FOREIGN KEY (RESTAURANT_ID) REFERENCES RESTAURANTS(RESTAURANT_ID)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> CREATE TABLE ORDER_ITEMS (
+    ->   ORDER_ID INT,
+    ->   ITEM_ID INT,
+    ->   QUANTITY INT,
+    ->   PRIMARY KEY (ORDER_ID, ITEM_ID),
+    ->   FOREIGN KEY (ORDER_ID) REFERENCES ORDERS(ORDER_ID),
+    ->   FOREIGN KEY (ITEM_ID) REFERENCES MENU_ITEMS(ITEM_ID)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> CREATE TABLE DELIVERY (
+    ->   DELIVERY_ID INT PRIMARY KEY,
+    ->   DELIVERY_STATUS VARCHAR(50),
+    ->   DELIVERY_TIME DATETIME,
+    ->   ORDER_ID INT UNIQUE,
+    ->   FOREIGN KEY (ORDER_ID) REFERENCES ORDERS(ORDER_ID)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> INSERT INTO CUSTOMERS VALUES
+    -> (1, 'SNEHA REDDY', '9876543210', 'HYDERABAD'),
+    -> (2, 'RAHUL SHARMA', '9123456780', 'HYDERABAD'),
+    -> (3, 'ANJALI MEHTA', '9988776655', 'BANGALORE'),
+    -> (4, 'KIRAN KUMAR', '9012345678', 'CHENNAI');
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO RESTAURANTS VALUES
+    -> (1, 'BIRYANI HOUSE', 'HYDERABAD', '9000011111'),
+    -> (2, 'PIZZA CORNER', 'HYDERABAD', '9000022222'),
+    -> (3, 'BURGER HUB', 'BANGALORE', '9000033333');
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO MENU_ITEMS VALUES
+    -> (1, 'CHICKEN BIRYANI', 250, 1),
+    -> (2, 'MUTTON BIRYANI', 320, 1),
+    -> (3, 'VEG PIZZA', 180, 2),
+    -> (4, 'CHEESE PIZZA', 220, 2),
+    -> (5, 'VEG BURGER', 120, 3),
+    -> (6, 'CHICKEN BURGER', 150, 3);
+Query OK, 6 rows affected (0.01 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO ORDERS VALUES
+    -> (1, '2024-01-10', 500, 1, 1),
+    -> (2, '2024-01-11', 220, 2, 2),
+    -> (3, '2024-01-12', 150, 3, 3),
+    -> (4, '2024-01-10', 320, 1, 1);
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO ORDER_ITEMS VALUES
+    -> (1, 1, 2),
+    -> (1, 3, 1),
+    -> (2, 4, 1),
+    -> (3, 6, 1),
+    -> (4, 2, 1);
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO DELIVERY VALUES
+    -> (1, 'DELIVERED', '2024-01-10 13:00:00', 1),
+    -> (2, 'PENDING', '2024-01-11 14:00:00', 2),
+    -> (3, 'DELIVERED', '2024-01-12 15:00:00', 3),
+    -> (4, 'PENDING', '2024-01-10 16:00:00', 4);
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> SELECT*FROM CUSTOMERS;
++-------------+--------------+------------+-----------+
+| CUSTOMER_ID | NAME         | PHONE      | ADDRESS   |
++-------------+--------------+------------+-----------+
+|           1 | SNEHA REDDY  | 9876543210 | HYDERABAD |
+|           2 | RAHUL SHARMA | 9123456780 | HYDERABAD |
+|           3 | ANJALI MEHTA | 9988776655 | BANGALORE |
+|           4 | KIRAN KUMAR  | 9012345678 | CHENNAI   |
++-------------+--------------+------------+-----------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT*FROM RESTAURANTS;
++---------------+---------------+-----------+------------+
+| RESTAURANT_ID | NAME          | LOCATION  | PHONE      |
++---------------+---------------+-----------+------------+
+|             1 | BIRYANI HOUSE | HYDERABAD | 9000011111 |
+|             2 | PIZZA CORNER  | HYDERABAD | 9000022222 |
+|             3 | BURGER HUB    | BANGALORE | 9000033333 |
++---------------+---------------+-----------+------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT*FROM MENU_ITEMS;
++---------+-----------------+--------+---------------+
+| ITEM_ID | ITEM_NAME       | PRICE  | RESTAURANT_ID |
++---------+-----------------+--------+---------------+
+|       1 | CHICKEN BIRYANI | 250.00 |             1 |
+|       2 | MUTTON BIRYANI  | 320.00 |             1 |
+|       3 | VEG PIZZA       | 180.00 |             2 |
+|       4 | CHEESE PIZZA    | 220.00 |             2 |
+|       5 | VEG BURGER      | 120.00 |             3 |
+|       6 | CHICKEN BURGER  | 150.00 |             3 |
++---------+-----------------+--------+---------------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT*FROM ORDERS;
++----------+------------+--------------+-------------+---------------+
+| ORDER_ID | ORDER_DATE | TOTAL_AMOUNT | CUSTOMER_ID | RESTAURANT_ID |
++----------+------------+--------------+-------------+---------------+
+|        1 | 2024-01-10 |       500.00 |           1 |             1 |
+|        2 | 2024-01-11 |       220.00 |           2 |             2 |
+|        3 | 2024-01-12 |       150.00 |           3 |             3 |
+|        4 | 2024-01-10 |       320.00 |           1 |             1 |
++----------+------------+--------------+-------------+---------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT*FROM ORDER_ITEMS;
++----------+---------+----------+
+| ORDER_ID | ITEM_ID | QUANTITY |
++----------+---------+----------+
+|        1 |       1 |        2 |
+|        1 |       3 |        1 |
+|        2 |       4 |        1 |
+|        3 |       6 |        1 |
+|        4 |       2 |        1 |
++----------+---------+----------+
+5 rows in set (0.00 sec)
+
+
+mysql> SELECT*FROM DELIVERY;
++-------------+-----------------+---------------------+----------+
+| DELIVERY_ID | DELIVERY_STATUS | DELIVERY_TIME       | ORDER_ID |
++-------------+-----------------+---------------------+----------+
+|           1 | DELIVERED       | 2024-01-10 13:00:00 |        1 |
+|           2 | PENDING         | 2024-01-11 14:00:00 |        2 |
+|           3 | DELIVERED       | 2024-01-12 15:00:00 |        3 |
+|           4 | PENDING         | 2024-01-10 16:00:00 |        4 |
++-------------+-----------------+---------------------+----------+
+4 rows in set (0.00 sec)
+
+
+mysql> --1️.DISPLAY ALL CUSTOMER NAMES ONLY
+mysql> SELECT NAME FROM CUSTOMERS;
++--------------+
+| NAME         |
++--------------+
+| SNEHA REDDY  |
+| RAHUL SHARMA |
+| ANJALI MEHTA |
+| KIRAN KUMAR  |
++--------------+
+4 rows in set (0.00 sec)
+
+mysql> --2️.SHOW ALL RESTAURANT NAMES AND LOCATIONS
+mysql> SELECT NAME, LOCATION FROM RESTAURANTS;
++---------------+-----------+
+| NAME          | LOCATION  |
++---------------+-----------+
+| BIRYANI HOUSE | HYDERABAD |
+| PIZZA CORNER  | HYDERABAD |
+| BURGER HUB    | BANGALORE |
++---------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> --3️.LIST ALL MENU ITEM NAMES
+mysql> SELECT ITEM_NAME FROM MENU_ITEMS;
++-----------------+
+| ITEM_NAME       |
++-----------------+
+| CHICKEN BIRYANI |
+| MUTTON BIRYANI  |
+| VEG PIZZA       |
+| CHEESE PIZZA    |
+| VEG BURGER      |
+| CHICKEN BURGER  |
++-----------------+
+6 rows in set (0.00 sec)
+
+mysql> --4.DISPLAY ALL ORDERS SORTED BY TOTAL AMOUNT 
+mysql> SELECT * FROM ORDERS ORDER BY TOTAL_AMOUNT;
++----------+------------+--------------+-------------+---------------+
+| ORDER_ID | ORDER_DATE | TOTAL_AMOUNT | CUSTOMER_ID | RESTAURANT_ID |
++----------+------------+--------------+-------------+---------------+
+|        3 | 2024-01-12 |       150.00 |           3 |             3 |
+|        2 | 2024-01-11 |       220.00 |           2 |             2 |
+|        4 | 2024-01-10 |       320.00 |           1 |             1 |
+|        1 | 2024-01-10 |       500.00 |           1 |             1 |
++----------+------------+--------------+-------------+---------------+
+4 rows in set (0.01 sec)
+
+
+mysql> --5.SHOW DISTINCT RESTAURANT LOCATIONS.
+mysql> SELECT DISTINCT LOCATION FROM RESTAURANTS;
++-----------+
+| LOCATION  |
++-----------+
+| HYDERABAD |
+| BANGALORE |
++-----------+
+2 rows in set (0.01 sec)
+
+mysql> --6️.COUNT TOTAL NUMBER OF CUSTOMERS 
+mysql> SELECT COUNT(*) AS TOTAL_CUSTOMERS FROM CUSTOMERS;
++-----------------+
+| TOTAL_CUSTOMERS |
++-----------------+
+|               4 |
++-----------------+
+1 row in set (0.01 sec)
+
+mysql> --7️.FIND THE MAXIMUM PRICE OF A MENU ITEM 
+mysql> SELECT MAX(PRICE) AS HIGHEST_PRICE FROM MENU_ITEMS;
++---------------+
+| HIGHEST_PRICE |
++---------------+
+|        320.00 |
++---------------+
+1 row in set (0.00 sec)
+
+mysql> --8.FIND THE MINIMUM ORDER AMOUNT 
+mysql> SELECT MIN(TOTAL_AMOUNT) AS LOWEST_ORDER FROM ORDERS;
++--------------+
+| LOWEST_ORDER |
++--------------+
+|       150.00 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> --9.SHOW CUSTOMER NAMES WITH THEIR ORDERS 
+mysql> SELECT C.NAME, O.ORDER_ID
+    -> FROM CUSTOMERS C
+    -> JOIN ORDERS O ON C.CUSTOMER_ID = O.CUSTOMER_ID;
++--------------+----------+
+| NAME         | ORDER_ID |
++--------------+----------+
+| SNEHA REDDY  |        1 |
+| SNEHA REDDY  |        4 |
+| RAHUL SHARMA |        2 |
+| ANJALI MEHTA |        3 |
++--------------+----------+
+4 rows in set (0.00 sec)
+
+mysql> --10.SHOW RESTAURANT NAME WITH MENU ITEMS 
+mysql> SELECT R.NAME, M.ITEM_NAME
+    -> FROM RESTAURANTS R
+    -> JOIN MENU_ITEMS M ON R.RESTAURANT_ID = M.RESTAURANT_ID;
++---------------+-----------------+
+| NAME          | ITEM_NAME       |
++---------------+-----------------+
+| BIRYANI HOUSE | CHICKEN BIRYANI |
+| BIRYANI HOUSE | MUTTON BIRYANI  |
+| PIZZA CORNER  | VEG PIZZA       |
+| PIZZA CORNER  | CHEESE PIZZA    |
+| BURGER HUB    | VEG BURGER      |
+| BURGER HUB    | CHICKEN BURGER  |
++---------------+-----------------+
+6 rows in set (0.00 sec)
+
+mysql> --11.SHOW ORDER WITH DELIVERY STATUS 
+mysql> SELECT O.ORDER_ID, D.DELIVERY_STATUS
+    -> FROM ORDERS O
+    -> JOIN DELIVERY D ON O.ORDER_ID = D.ORDER_ID;
++----------+-----------------+
+| ORDER_ID | DELIVERY_STATUS |
++----------+-----------------+
+|        1 | DELIVERED       |
+|        4 | PENDING         |
+|        2 | PENDING         |
+|        3 | DELIVERED       |
++----------+-----------------+
+4 rows in set (0.00 sec)
+
+mysql> --12.COUNT NUMBER OF ORDERS PER CUSTOMER 
+mysql> SELECT CUSTOMER_ID, COUNT(*) AS TOTAL_ORDERS
+    -> FROM ORDERS
+    -> GROUP BY CUSTOMER_ID;
++-------------+--------------+
+| CUSTOMER_ID | TOTAL_ORDERS |
++-------------+--------------+
+|           1 |            2 |
+|           2 |            1 |
+|           3 |            1 |
++-------------+--------------+
+3 rows in set (0.00 sec)
+
+mysql> --13.FIND TOTAL QUANTITY OF ITEMS IN EACH ORDER 
+mysql> SELECT ORDER_ID, SUM(QUANTITY) AS TOTAL_ITEMS
+    -> FROM ORDER_ITEMS
+    -> GROUP BY ORDER_ID;
++----------+-------------+
+| ORDER_ID | TOTAL_ITEMS |
++----------+-------------+
+|        1 |           3 |
+|        2 |           1 |
+|        3 |           1 |
+|        4 |           1 |
++----------+-------------+
+4 rows in set (0.00 sec)
+
+mysql> --14.SHOW MOST EXPENSIVE MENU ITEM 
+mysql> SELECT * FROM MENU_ITEMS
+    -> ORDER BY PRICE DESC
+    -> LIMIT 1;
++---------+----------------+--------+---------------+
+| ITEM_ID | ITEM_NAME      | PRICE  | RESTAURANT_ID |
++---------+----------------+--------+---------------+
+|       2 | MUTTON BIRYANI | 320.00 |             1 |
++---------+----------------+--------+---------------+
+1 row in set (0.00 sec)
+
+mysql> --15.SHOW ALL PENDING DELIVERIES 
+mysql> SELECT * FROM DELIVERY
+    -> WHERE DELIVERY_STATUS = 'PENDING';
++-------------+-----------------+---------------------+----------+
+| DELIVERY_ID | DELIVERY_STATUS | DELIVERY_TIME       | ORDER_ID |
++-------------+-----------------+---------------------+----------+
+|           2 | PENDING         | 2024-01-11 14:00:00 |        2 |
+|           4 | PENDING         | 2024-01-10 16:00:00 |        4 |
++-------------+-----------------+---------------------+----------+
+2 rows in set (0.00 sec)
+
+mysql> --16.SHOW MENU ITEMS WITH RESTAURANT NAME AND PRICE 
+mysql> SELECT M.ITEM_NAME, R.NAME, M.PRICE
+    -> FROM MENU_ITEMS M
+    -> JOIN RESTAURANTS R ON M.RESTAURANT_ID = R.RESTAURANT_ID;
++-----------------+---------------+--------+
+| ITEM_NAME       | NAME          | PRICE  |
++-----------------+---------------+--------+
+| CHICKEN BIRYANI | BIRYANI HOUSE | 250.00 |
+| MUTTON BIRYANI  | BIRYANI HOUSE | 320.00 |
+| VEG PIZZA       | PIZZA CORNER  | 180.00 |
+| CHEESE PIZZA    | PIZZA CORNER  | 220.00 |
+| VEG BURGER      | BURGER HUB    | 120.00 |
+| CHICKEN BURGER  | BURGER HUB    | 150.00 |
++-----------------+---------------+--------+
+6 rows in set (0.00 sec)
+
+mysql> --17.FIND CUSTOMER WHO PLACED MAXIMUM ORDERS 
+mysql> SELECT CUSTOMER_ID, COUNT(*) AS TOTAL_ORDERS
+    -> FROM ORDERS
+    -> GROUP BY CUSTOMER_ID
+    -> ORDER BY TOTAL_ORDERS DESC
+    -> LIMIT 1;
++-------------+--------------+
+| CUSTOMER_ID | TOTAL_ORDERS |
++-------------+--------------+
+|           1 |            2 |
++-------------+--------------+
+1 row in set (0.00 sec)
+
+mysql> --18.FIND RESTAURANT WITH MAXIMUM ORDERS 
+mysql> SELECT RESTAURANT_ID, COUNT(*) AS TOTAL_ORDERS
+    -> FROM ORDERS
+    -> GROUP BY RESTAURANT_ID
+    -> ORDER BY TOTAL_ORDERS DESC
+    -> LIMIT 1;
++---------------+--------------+
+| RESTAURANT_ID | TOTAL_ORDERS |
++---------------+--------------+
+|             1 |            2 |
++---------------+--------------+
+1 row in set (0.00 sec)
+
+mysql> --19.FIND TOTAL REVENUE GENERATED BY EACH RESTAURANT 
+mysql> SELECT RESTAURANT_ID, SUM(TOTAL_AMOUNT) AS REVENUE
+    -> FROM ORDERS
+    -> GROUP BY RESTAURANT_ID;
++---------------+---------+
+| RESTAURANT_ID | REVENUE |
++---------------+---------+
+|             1 |  820.00 |
+|             2 |  220.00 |
+|             3 |  150.00 |
++---------------+---------+
+3 rows in set (0.00 sec)
+
+mysql> --20.LIST TOP 3 MOST ORDERED MENU ITEMS 
+mysql> SELECT ITEM_ID, SUM(QUANTITY) AS TOTAL_QUANTITY
+    -> FROM ORDER_ITEMS
+    -> GROUP BY ITEM_ID
+    -> ORDER BY TOTAL_QUANTITY DESC
+    -> LIMIT 3;
++---------+----------------+
+| ITEM_ID | TOTAL_QUANTITY |
++---------+----------------+
+|       1 |              2 |
+|       2 |              1 |
+|       3 |              1 |
++---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> --21.FIND CUSTOMERS WHO NEVER PLACED ANY ORDER 
+mysql> SELECT * FROM CUSTOMERS
+    -> WHERE CUSTOMER_ID NOT IN (SELECT CUSTOMER_ID FROM ORDERS);
++-------------+-------------+------------+---------+
+| CUSTOMER_ID | NAME        | PHONE      | ADDRESS |
++-------------+-------------+------------+---------+
+|           4 | KIRAN KUMAR | 9012345678 | CHENNAI |
++-------------+-------------+------------+---------+
+1 row in set (0.01 sec)
+
+mysql> --22.SHOW ORDERS ABOVE AVERAGE ORDER AMOUNT 
+mysql> SELECT * FROM ORDERS
+    -> WHERE TOTAL_AMOUNT > (SELECT AVG(TOTAL_AMOUNT) FROM ORDERS);
++----------+------------+--------------+-------------+---------------+
+| ORDER_ID | ORDER_DATE | TOTAL_AMOUNT | CUSTOMER_ID | RESTAURANT_ID |
++----------+------------+--------------+-------------+---------------+
+|        1 | 2024-01-10 |       500.00 |           1 |             1 |
+|        4 | 2024-01-10 |       320.00 |           1 |             1 |
++----------+------------+--------------+-------------+---------------+
+2 rows in set (0.00 sec)
+
+mysql> --23.FIND RESTAURANT WITH HIGHEST PRICED MENU ITEM 
+mysql> SELECT R.NAME
+    -> FROM RESTAURANTS R
+    -> JOIN MENU_ITEMS M ON R.RESTAURANT_ID = M.RESTAURANT_ID
+    -> ORDER BY M.PRICE DESC
+    -> LIMIT 1;
++---------------+
+| NAME          |
++---------------+
+| BIRYANI HOUSE |
++---------------+
+1 row in set (0.01 sec)
+
+mysql> 24.SHOW ORDER HAVING MAXIMUM TOTAL QUANTITY OF ITEMS 
+mysql> SELECT ORDER_ID, SUM(QUANTITY) AS TOTAL_ITEMS
+    -> FROM ORDER_ITEMS
+    -> GROUP BY ORDER_ID
+    -> ORDER BY TOTAL_ITEMS DESC
+    -> LIMIT 1;
++----------+-------------+
+| ORDER_ID | TOTAL_ITEMS |
++----------+-------------+
+|        1 |           3 |
++----------+-------------+
+1 row in set (0.00 sec)
